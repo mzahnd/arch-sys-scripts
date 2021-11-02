@@ -1,0 +1,7 @@
+[Unit]
+Description=Clear pacman cache weekly, keeping the last 2 versions of installed packages
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/paccache-clean
+

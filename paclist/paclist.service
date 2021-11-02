@@ -1,0 +1,10 @@
+[Unit]
+ConditionFileIsExecutable=/usr/local/bin/paclist
+
+[Service]
+WorkingDirectory=/usr/local/bin/
+Type=oneshot
+ExecStart=/bin/bash /usr/local/bin/paclist --backup '/var/local/paclist/'
+
+[Install]
+WantedBy=multi-user.target

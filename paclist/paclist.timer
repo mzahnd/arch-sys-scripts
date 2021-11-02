@@ -1,0 +1,14 @@
+[Unit]
+Description=List installed packages in '/var/local/paclist/'.
+
+[Timer]
+# Every day
+OnCalendar=daily
+
+RandomizedDelaySec=30
+AccuracySec=5m
+
+Persistent=true
+
+[Install]
+WantedBy=timers.target

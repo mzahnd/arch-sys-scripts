@@ -1,0 +1,9 @@
+[Unit]
+Description=Clear pacman cache weekly, keeping the last 2 versions of installed packages
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+
+[Install]
+WantedBy=timers.target
