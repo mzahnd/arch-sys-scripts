@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 
 # The MIT License.
@@ -70,18 +70,35 @@ readonly CONFIGS=(\
 function kill_conky()
 {
     local counter=0
+    local pid_list=""
+    local children=""
 
     # Terminate already running conky instances
-    killall --quiet 'conky'
+    #killall --quiet 'conky' # Old way
 
-    # Wait until the processes have been shut down
-    while pgrep -u $UID -x 'conky' >/dev/null; do
-        counter=$((counter+1))
-        sleep 1
+    # List 'conky' processes ignoring conky_launch (see the grep line). This is
+    # very (!) important because 'kill' will try to _kill_ 'conky_launch' and
+    # that's not what we want.
+    # Then create a single-line space-separated string
+    pid_list=$(\
+        ps x -o "%p %c" | \
+            grep -iE '[[:alnum:]]+\ conky$' | \
+            awk '{print $1}' ORS=' ' 2> /dev/null \
+    )
 
-        # Fail if conky couldn't be killed after 30 seconds
-        [ "${counter}" -gt 30 ] && return 1
-    done
+    # List 'conky' direct children if they exist
+    [ -n "$pid_list" ] && children=$(\
+        ps -o pid= --ppid $pid_list | awk '{print $1}' ORS=' ' 2> /dev/null \
+    )
+
+    if [ -n "$children" ]; then
+       kill $children 
+       wait $children 2> /dev/null
+    fi
+    if [ -n "$pid_list" ]; then
+       kill $pid_list
+       wait $pid_list 2> /dev/null
+    fi
 
     return 0
 }
@@ -110,7 +127,7 @@ function launch_conky()
 
     [ "${CONKY_DEBUG}" ] && args+=('--debug') || args+=('--daemonize')
 
-    conky "${args[@]}"
+    conky --daemonize "${args[@]}"
     return $?
 }
 
