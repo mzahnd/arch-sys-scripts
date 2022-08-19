@@ -39,6 +39,13 @@ shopt -s extglob
 SCRIPT_DIR="$(dirname ${BASH_SOURCE[0]})"
 pushd "${SCRIPT_DIR}" &> /dev/null
 
+# Multiplier constant for brightness setting
+
+CONST_MULTIPLIER_BRG=$(\
+        echo "${MAX_BRG} / 100" | \
+        bc | \
+        awk '{print int($1+0.5)}')
+
 # Help message
 #
 # Arguments
@@ -123,7 +130,7 @@ EOF
 function decrement()
 {
     local new_brg=$(\
-        echo "${CURRENT_BRG} - (15*${1})" | \
+        echo "${CURRENT_BRG} - ($CONST_MULTIPLIER_BRG*${1})" | \
         bc | \
         awk '{print int($1+0.5)}')
 
@@ -148,7 +155,7 @@ function decrement()
 function increment()
 {
     local new_brg=$(\
-        echo "(15*${1}) + ${CURRENT_BRG}" | \
+        echo "($CONST_MULTIPLIER_BRG*${1}) + ${CURRENT_BRG}" | \
         bc | \
         awk '{print int($1+0.5)}')
     
@@ -174,7 +181,7 @@ function increment()
 function set_brg()
 {
     local new_brg=$(\
-        echo "15*${1}" | \
+        echo "$CONST_MULTIPLIER_BRG*${1}" | \
         bc | \
         awk '{print int($1+0.5)}')
 
