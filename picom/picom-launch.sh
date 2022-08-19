@@ -109,7 +109,7 @@ function start_picom()
 
     if [ -n "${PICOM_DEBUG}" ] && [ ${PICOM_DEBUG} -eq 1 ]
     then
-        args+=("--log-level \"DEBUG\"")
+        args+=("--log-level" "debug")
     else
         args+=("--daemon")
     fi
