@@ -190,23 +190,48 @@ function install_packages()
     # Refresh package database
     sudo pacman -Syy
 
-    [ -f "${FILE_OFFICIAL_PKGS}" ] &&                               \
-        ( sudo pacman -S --needed - < ${FILE_OFFICIAL_PKGS};        \
-        return_code=$(($? + $return_code)) )                        \
-    || info "File ${FILE_OFFICIAL_PKGS} does not exist. Skipping."; \
-        return_code=$(($return_code + 1))
+    local installable_packages=$(comm -12 \
+        <(pacman -Slq | sort) \
+        <(sort ${FILE_OFFICIAL_PKGS}))
 
-    [ -f "${FILE_OPT_DEPS}" ] &&                                    \
-        ( sudo pacman -S --asdeps --needed - < ${FILE_OPT_DEPS};    \
-        return_code=$(($? + $return_code)) )                        \
-    || info "File ${FILE_OPT_DEPS} does not exist. Skipping.";      \
-        return_code=$(($return_code + 1))
+    local non_installable_packages=$(comm -13 \
+        <(pacman -Slq | sort) \
+        <(sort ${FILE_OFFICIAL_PKGS}))
 
-    [ -f "${FILE_AUR_PKGS}" ] &&                                    \
-        ( yay -S --aur --needed - < ${FILE_AUR_PKGS}                \
-        return_code=$(($? + $return_code)) )                        \
-    || info "File ${FILE_AUR_PKGS} does not exist. Skipping.";      \
+    if [ -f "${FILE_OFFICIAL_PKGS}" ]
+    then
+        sudo pacman -S --needed ${installable_packages}
+        return_code=$(($? + $return_code))
+    else
+        info "File ${FILE_OFFICIAL_PKGS} does not exist. Skipping."
+
         return_code=$(($return_code + 1))
+    fi
+
+    if [ -f "${FILE_OPT_DEPS}" ]
+    then
+        sudo pacman -S --asdeps --needed - < ${FILE_OPT_DEPS}
+        return_code=$(($? + $return_code))
+    else
+        info "File ${FILE_OPT_DEPS} does not exist. Skipping."
+        return_code=$(($return_code + 1))
+    fi
+
+    if [ -f "${FILE_AUR_PKGS}" ]
+    then
+         yay -S --aur --needed - < ${FILE_AUR_PKGS}
+        return_code=$(($? + $return_code))
+    else
+        info "File ${FILE_AUR_PKGS} does not exist. Skipping."
+        return_code=$(($return_code + 1))
+    fi
+
+    if [ -n ${non_installable_packages} ]
+    then
+        info "The following packages were not installed:"
+        echo ${non_installable_packages}
+        return_code=$(($return_code + 1))
+    fi
 
     return $return_code
 }
