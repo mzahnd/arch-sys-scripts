@@ -35,9 +35,9 @@
 # ====== EDITABLE SECTION ======
 
 # Absolute path to configuration file(s). At least one is mandatory.
+# "${HOME}/.config/conky/calendar.conf"
+# "${HOME}/.config/conky/calendar-personal.conf"
 readonly CONFIGS=(\
-    "${HOME}/.config/conky/calendar.conf"           \
-    "${HOME}/.config/conky/calendar-personal.conf"  \
     "${HOME}/.config/conky/sys.conf"                \
 )
 
