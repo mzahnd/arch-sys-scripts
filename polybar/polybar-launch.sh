@@ -130,7 +130,7 @@ function get_bar_index()
     local index=0
 
     index=$(echo "${1}" | awk '{print $1}' | cut -d ":" -f 1 -)
-    [ -z ${BARS[${index}]} ] && index=0
+    [ -z "${BARS["${index}"]}" ] && index=0
 
     return $index
 }
@@ -167,6 +167,7 @@ function create_bars()
         launch_bar "${bar_index}" "$(echo "${line}" | awk '{print $NF}')"
    done < <(xrandr --listmonitors)
 
+   # shellcheck disable=SC2164
    popd &> /dev/null
 
    return 0
