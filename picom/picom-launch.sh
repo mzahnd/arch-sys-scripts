@@ -34,7 +34,9 @@
 # ====== EDITABLE SECTION ======
 
 # Enable (1) or disable (0) experimental backends
-readonly EXPERIMENTAL_BACKENDS=1
+# Disabled by default. Removed in v10-rc1
+# See: https://github.com/yshui/picom/releases/tag/v10-rc1
+readonly EXPERIMENTAL_BACKENDS=0
 
 # Optional. Provide full path.
 readonly CONFIG_FILE_PATH="${HOME}/.config/picom/picom.conf"
@@ -109,7 +111,7 @@ function start_picom()
 
     if [ -n "${PICOM_DEBUG}" ] && [ ${PICOM_DEBUG} -eq 1 ]
     then
-        args+=("--log-level \"DEBUG\"")
+        args+=("--log-level" "debug")
     else
         args+=("--daemon")
     fi
