@@ -36,8 +36,15 @@ readonly MAX_BRG="$(<"${MAX_BRG_PATH}")"
 shopt -s extglob
 
 # Run from inside script's directory
-SCRIPT_DIR="$(dirname ${BASH_SOURCE[0]})"
-pushd "${SCRIPT_DIR}" &> /dev/null
+SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+if ! pushd "${SCRIPT_DIR}" &> /dev/null; then
+    exit 1
+fi
+
+# Multiplier constant for brightness setting
+CONST_MULTIPLIER_BRG=$(\
+        echo "${MAX_BRG} / 100" | bc | awk '{print int($1+0.5)}' \
+)
 
 # Help message
 #
@@ -122,12 +129,15 @@ EOF
 #   0 : Success
 function decrement()
 {
-    local new_brg=$(\
-        echo "${CURRENT_BRG} - (15*${1})" | \
+    local new_brg=0
+    new_brg=$(\
+        echo "${CURRENT_BRG} - ($CONST_MULTIPLIER_BRG*${1})" | \
         bc | \
         awk '{print int($1+0.5)}')
 
-    [ "${new_brg}" -le 0 ] && new_brg=0
+    if [ "${new_brg}" -le "0" ]; then
+        new_brg=0
+    fi
 
     echo "${new_brg}" > "${CURRENT_BRG_PATH}"
 
@@ -147,13 +157,16 @@ function decrement()
 #   0 : Success.
 function increment()
 {
-    local new_brg=$(\
-        echo "(15*${1}) + ${CURRENT_BRG}" | \
-        bc | \
-        awk '{print int($1+0.5)}')
+    local new_brg=0
+
+    new_brg=$(\
+        echo "($CONST_MULTIPLIER_BRG*${1}) + ${CURRENT_BRG}" | \
+        bc | awk '{print int($1+0.5)}' \
+    )
     
-    [ "${new_brg}" -ge "${MAX_BRG}" ] && new_brg=$(echo "${MAX_BRG}" | \
-                                                    awk '{print int($1)}')
+    if [ "${new_brg}" -ge "${MAX_BRG}" ]; then
+        new_brg=$(echo "${MAX_BRG}" | awk '{print int($1)}')
+    fi
 
     echo "${new_brg}" > "${CURRENT_BRG_PATH}"
 
@@ -173,14 +186,19 @@ function increment()
 #   0 : Success.
 function set_brg()
 {
-    local new_brg=$(\
-        echo "15*${1}" | \
-        bc | \
-        awk '{print int($1+0.5)}')
+    local new_brg=0
 
-    [ "${new_brg}" -ge "${MAX_BRG}" ] && new_brg=$(echo "${MAX_BRG}" | \
-                                                    awk '{print int($1)}')
-    [ "${new_brg}" -le 0 ] && new_brg=0
+    new_brg=$(\
+        echo "$CONST_MULTIPLIER_BRG*${1}" | bc | awk '{print int($1+0.5)}' \
+    )
+
+    if [ "${new_brg}" -ge "${MAX_BRG}" ]; then
+        new_brg=$(echo "${MAX_BRG}" | awk '{print int($1)}')
+    fi
+
+    if [ "${new_brg}" -le 0 ]; then
+        new_brg=0
+    fi
 
     echo "${new_brg}" > "${CURRENT_BRG_PATH}"
 
@@ -200,7 +218,10 @@ function set_brg()
 function popdir()
 {
     # Exit script directory
-    popd &> /dev/null
+    if popd &> /dev/null; then
+        return 1
+    fi
+
     return 0
 }
 
@@ -212,8 +233,13 @@ case "${1,,}" in
 esac
 
 # Argument $2 must be a number in range [0; 100]
-[[ ! "${2}" =~ (^[[:digit:]]+$) ]] && usage && exit 1
-[[ "${2}" -lt 0 || "${2}" -gt 100 ]] && usage && exit 1
+if [[ ! "${2}" =~ (^[[:digit:]]+$) ]]; then
+    usage
+    exit 1
+elif [[ "${2}" -lt 0 || "${2}" -gt 100 ]]; then
+    usage
+    exit 1
+fi
 
 case "${1,,}" in
     *(-)i|*(-)inc|*(-)increment) increment "${2}" ;;
