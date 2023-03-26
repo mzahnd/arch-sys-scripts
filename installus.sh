@@ -29,15 +29,17 @@
 
 # Call 'install.sh' in all listed folders:
 readonly SCRIPTS_TO_INSTALL=(\
-    'backlight'     \
-    'conky'         \
-    'feh'           \
-    'lockscreen'    \
-    'paccache'      \
-    'paclist'       \
-    'picom'         \
-    'polybar'       \
-)
+        'backlight'     \
+        'conky'         \
+        'feh'           \
+        'lockscreen'    \
+        'microphone'    \
+        'paccache'      \
+        'paclist'       \
+        'picom'         \
+        'polybar'       \
+        'volume'        \
+    )
 
 # Leave this before any function.
 [ ${UID} -ne 0 ] && echo "Please run this script as root." && exit 1
