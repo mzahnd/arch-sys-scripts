@@ -1,12 +1,12 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import asyncio
 import re
 
 from i3ipc.aio import Connection
 
-OUTPUT_MAIN = "eDP1"
-OUTPUT_IGNORE = ("xroot-0", "VIRTUAL1")  # Outputs to ignore
+OUTPUT_MAIN = "eDP-1"
+OUTPUT_IGNORE = ("xroot-0", "VIRTUAL-1", "DP-1", "HDMI-2")  # Outputs to ignore
 
 
 async def get_focused_monitor(i3, primary, secondary):
@@ -89,6 +89,7 @@ async def main():
     secondary_output = None
 
     for output in outputs:
+        print(output.name)
         if output.name == OUTPUT_MAIN:
             primary_output = output
         elif output.name in OUTPUT_IGNORE:
