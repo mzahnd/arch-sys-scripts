@@ -1,17 +1,17 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The MIT License.
 #
 # Copyright (c) 2021 Martín E. Zahnd < mzahnd at itba dot edu dot ar >
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights 
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-# copies of the Software, and to permit persons to whom the Software is 
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in 
+# The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -35,8 +35,8 @@ FILE_AUR_PKGS="packages_list_aur"
 shopt -s extglob
 
 # Run from inside script's directory
-SCRIPT_DIR="$(dirname ${BASH_SOURCE[0]})"
-pushd "${SCRIPT_DIR}" &> /dev/null
+SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+pushd "$SCRIPT_DIR" &> /dev/null || exit 1
 
 # Help message
 #
@@ -50,16 +50,16 @@ pushd "${SCRIPT_DIR}" &> /dev/null
 #   0 : Success.
 function usage()
 {
-cat <<EOF
+    cat <<EOF
 Usage ${0##*/} [OPTION]
 
 Available OPTIONs:
     --install [folder]
     install   [folder]
                         Install packages listed in files:
-                            - Official packages:     '${FILE_OFFICIAL_PKGS}'
-                            - Optional dependencies: '${FILE_OPT_DEPS}'
-                            - AUR packages:          '${FILE_AUR_PKGS}'
+                            - Official packages:     '$FILE_OFFICIAL_PKGS'
+                            - Optional dependencies: '$FILE_OPT_DEPS'
+                            - AUR packages:          '$FILE_AUR_PKGS'
                         Optional argument 'folder' tells where these files are.
                         If 'folder' is not specified, the files will be picked
                         from the directory with the script.
@@ -68,11 +68,11 @@ Available OPTIONs:
     --backup  [folder]
     bckp      [folder]
                         List installed packages in these files inside 'folder':
-                            - Official packages:     '${FILE_OFFICIAL_PKGS}'
-                            - Optional dependencies: '${FILE_OPT_DEPS}'
-                            - AUR packages:          '${FILE_AUR_PKGS}'
-                        If optional argument 'folder' is not specified, the 
-                        files listed above will be stored in the directory 
+                            - Official packages:     '$FILE_OFFICIAL_PKGS'
+                            - Optional dependencies: '$FILE_OPT_DEPS'
+                            - AUR packages:          '$FILE_AUR_PKGS'
+                        If optional argument 'folder' is not specified, the
+                        files listed above will be stored in the directory
                         containing the script.
 
     --help
@@ -99,7 +99,7 @@ EOF
 #   0 : Success.
 function license()
 {
-cat <<EOF
+    cat <<EOF
 The MIT License.
 
 Copyright (c) 2021 Martín E. Zahnd \< mzahnd at itba dot edu dot ar \>
@@ -122,7 +122,7 @@ EOF
 #   * : Message to print.
 #
 # Echoes
-#   Message with format 
+#   Message with format
 #   [date-time] message
 #
 # Returns
@@ -147,25 +147,33 @@ function info()
 #
 # Returns
 #   0 : Success.
-#   1 : Failure due to developer error (most probably: argument $1 is not a 
+#   1 : Failure due to developer error (most probably: argument $1 is not a
 #   regular file)
-function replace_files () 
+function replace_files ()
 {
-    [ -f "${2}" ] && mv "${2}" "${2}.bckp"
-    [ -f "${1}" ] && mv "${1}" "${2}" || (info "Developer error!" && return 1)
+    if [ -f "$2" ]; then
+        mv --force "$2" "${2}.bckp"
+    fi
+
+    if [ -f "$1" ]; then
+        mv --force "$1" "$2"
+    else
+        info "Developer error!"
+        return 1
+    fi
 
     # Make readable for everyone
-    chmod 444 "${2}"
+    chmod 444 "$2"
     return 0
 }
 
 # Install packages from a list of files.
 #
 # A full package list update is performed at the beggining, and then packages
-# installation is performed using the provided lists. It uses Yay for AUR 
+# installation is performed using the provided lists. It uses Yay for AUR
 # packages.
 #
-# Files are specified using $FILE_OFFICIAL_PKGS, $FILE_OPT_DEPS, and 
+# Files are specified using $FILE_OFFICIAL_PKGS, $FILE_OPT_DEPS, and
 # $FILE_AUR_PKGS variables.
 #
 # Arguments
@@ -176,61 +184,62 @@ function replace_files ()
 #
 # Returns
 #       0 : Success.
-#   1 - 3 : Ammount of list files that could not be found or failed during 
+#   1 - 3 : Ammount of list files that could not be found or failed during
 #          installation.
 function install_packages()
 {
     local return_code=0
 
-    [ "${1}" ] \
-        && FILE_OFFICIAL_PKGS="${1}/${FILE_OFFICIAL_PKGS}"  \
-        && FILE_OPT_DEPS="${1}/${FILE_OPT_DEPS}"            \
-        && FILE_AUR_PKGS="${1}/${FILE_AUR_PKGS}"
+    [ "$1" ] \
+        && FILE_OFFICIAL_PKGS="$1/$FILE_OFFICIAL_PKGS"  \
+        && FILE_OPT_DEPS="$1/$FILE_OPT_DEPS"            \
+        && FILE_AUR_PKGS="$1/$FILE_AUR_PKGS"
 
     # Refresh package database
     sudo pacman -Syy
 
     local installable_packages=$(comm -12 \
-        <(pacman -Slq | sort) \
-        <(sort ${FILE_OFFICIAL_PKGS}))
+            <(pacman -Slq | sort) \
+        <(sort "$FILE_OFFICIAL_PKGS"))
 
     local non_installable_packages=$(comm -13 \
-        <(pacman -Slq | sort) \
-        <(sort ${FILE_OFFICIAL_PKGS}))
+            <(pacman -Slq | sort) \
+        <(sort "$FILE_OFFICIAL_PKGS"))
 
-    if [ -f "${FILE_OFFICIAL_PKGS}" ]
+    if [ -f "$FILE_OFFICIAL_PKGS" ]
     then
-        sudo pacman -S --needed ${installable_packages}
-        return_code=$(($? + $return_code))
-    else
-        info "File ${FILE_OFFICIAL_PKGS} does not exist. Skipping."
+        sudo pacman -S --needed $installable_packages
 
-        return_code=$(($return_code + 1))
+        return_code=$(($? + return_code))
+    else
+        info "File $FILE_OFFICIAL_PKGS does not exist. Skipping."
+
+        return_code=$((return_code + 1))
     fi
 
-    if [ -f "${FILE_OPT_DEPS}" ]
+    if [ -f "$FILE_OPT_DEPS" ]
     then
-        sudo pacman -S --asdeps --needed - < ${FILE_OPT_DEPS}
-        return_code=$(($? + $return_code))
+        sudo pacman -S --asdeps --needed - < $FILE_OPT_DEPS
+        return_code=$(($? + return_code))
     else
-        info "File ${FILE_OPT_DEPS} does not exist. Skipping."
-        return_code=$(($return_code + 1))
+        info "File $FILE_OPT_DEPS does not exist. Skipping."
+        return_code=$((return_code + 1))
     fi
 
-    if [ -f "${FILE_AUR_PKGS}" ]
+    if [ -f "$FILE_AUR_PKGS" ]
     then
-         yay -S --aur --needed - < ${FILE_AUR_PKGS}
-        return_code=$(($? + $return_code))
+        yay -S --aur --needed - < $FILE_AUR_PKGS
+        return_code=$(($? + return_code))
     else
-        info "File ${FILE_AUR_PKGS} does not exist. Skipping."
-        return_code=$(($return_code + 1))
+        info "File $FILE_AUR_PKGS does not exist. Skipping."
+        return_code=$((return_code + 1))
     fi
 
-    if [ -n ${non_installable_packages} ]
+    if [ -n "$non_installable_packages" ]
     then
         info "The following packages were not installed:"
-        echo ${non_installable_packages}
-        return_code=$(($return_code + 1))
+        echo "$non_installable_packages"
+        return_code=$((return_code + 1))
     fi
 
     return $return_code
@@ -238,7 +247,7 @@ function install_packages()
 
 # Export a list of installed packages in the running machine.
 #
-# Lists are exported to $FILE_OFFICIAL_PKGS, $FILE_OPT_DEPS, and 
+# Lists are exported to $FILE_OFFICIAL_PKGS, $FILE_OPT_DEPS, and
 # $FILE_AUR_PKGS except when argument 1 is given.
 #
 # Arguments
@@ -255,23 +264,23 @@ function backup_packages()
     local return_code=0
 
     local mktemp_template='packages_list.tmp.XXXXXX'
-    local official_pkgs_tmp=$(mktemp -p '/tmp' "${mktemp_template}")
-    local opt_deps_tmp=$(mktemp -p '/tmp' "${mktemp_template}")
-    local aur_pkgs_tmp=$(mktemp -p '/tmp' "${mktemp_template}")
+    local official_pkgs_tmp=$(mktemp -p '/tmp' "$mktemp_template")
+    local opt_deps_tmp=$(mktemp -p '/tmp' "$mktemp_template")
+    local aur_pkgs_tmp=$(mktemp -p '/tmp' "$mktemp_template")
 
-    if [ "${1}" ]; then
-       [ ! -d "${1}" ] && mkdir -p "${1}" &> /dev/null
-        if [ -w "${1}" ]; then
+    if [ "$1" ]; then
+        [ ! -d "$1" ] && mkdir -p "$1" &> /dev/null
+        if [ -w "$1" ]; then
             FILE_OFFICIAL_PKGS="${1}/${FILE_OFFICIAL_PKGS}"
             FILE_OPT_DEPS="${1}/${FILE_OPT_DEPS}"
             FILE_AUR_PKGS="${1}/${FILE_AUR_PKGS}"
         elif [ -w "." ]; then
-            info "No write permission for directory ${1}. Storing in ${PWD}"
+            info "No write permission for directory ${1}. Storing in $PWD"
 
             return_code=1
         else
-            local tmpdir=$(mktemp -p '/tmp' -d "${mktemp_template}")
-            info "No write permission for directory ${2}. Storing in ${tmpdir}"
+            local tmpdir=$(mktemp -p '/tmp' -d "$mktemp_template")
+            info "No write permission for directory ${2}. Storing in $tmpdir"
             FILE_OFFICIAL_PKGS="${tmpdir}/${FILE_OFFICIAL_PKGS}"
             FILE_OPT_DEPS="${tmpdir}/${FILE_OPT_DEPS}"
             FILE_AUR_PKGS="${tmpdir}/${FILE_AUR_PKGS}"
@@ -280,22 +289,22 @@ function backup_packages()
         fi
     fi
 
-    pacman -Qqen > "${official_pkgs_tmp}" \
-        && replace_files "${official_pkgs_tmp}" "${FILE_OFFICIAL_PKGS}" \
+    pacman -Qqen > "$official_pkgs_tmp" \
+        && replace_files "$official_pkgs_tmp" "$FILE_OFFICIAL_PKGS" \
         || return_code=1
 
     comm -13 \
-        <(pacman -Qqdt | sort)  \
-        <(pacman -Qqdtt | sort) \
-        > ${opt_deps_tmp}       \
-    && replace_files "${opt_deps_tmp}" "${FILE_OPT_DEPS}" \
-    || return_code=1
+        <(pacman -Qqdt | sort)   \
+        <(pacman -Qqdtt | sort)  \
+        > "$opt_deps_tmp"      \
+        && replace_files "$opt_deps_tmp" "$FILE_OPT_DEPS" \
+        || return_code=1
 
-    pacman -Qqem > ${aur_pkgs_tmp} \
-    && replace_files "${aur_pkgs_tmp}" "${FILE_AUR_PKGS}" \
-    || return_code=1
+    pacman -Qqem > "$aur_pkgs_tmp" \
+        && replace_files "$aur_pkgs_tmp" "$FILE_AUR_PKGS" \
+        || return_code=1
 
-    return ${return_code}
+    return $return_code
 }
 
 # === MAIN ===
@@ -305,20 +314,24 @@ _SCRIPT_EXIT_CODE=0
 
 case "${1,,}" in
     *(-)install)
-        install_packages "${2}";    _SCRIPT_EXIT_CODE=$?
-        ;;
-    *(-)backup|*(-)bckp)
-        backup_packages "${2}";     _SCRIPT_EXIT_CODE=$?
-        ;;
-    *(-)license)
-        license;                    _SCRIPT_EXIT_CODE=1
-        ;;
-    *)
-        usage;                      _SCRIPT_EXIT_CODE=1
-        ;;
+    install_packages "$2"
+    _SCRIPT_EXIT_CODE=$?
+    ;;
+*(-)backup|*(-)bckp)
+backup_packages "$2"
+_SCRIPT_EXIT_CODE=$?
+;;
+*(-)license)
+license
+_SCRIPT_EXIT_CODE=1
+;;
+*)
+usage
+_SCRIPT_EXIT_CODE=1
+;;
 esac
 
 # Exit script directory
 popd &> /dev/null
 
-exit ${_SCRIPT_EXIT_CODE}
+exit $_SCRIPT_EXIT_CODE
