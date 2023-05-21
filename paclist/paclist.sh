@@ -198,13 +198,9 @@ function install_packages()
     # Refresh package database
     sudo pacman -Syy
 
-    local installable_packages=$(comm -12 \
-            <(pacman -Slq | sort) \
-        <(sort "$FILE_OFFICIAL_PKGS"))
+    local installable_packages=$(comm -12 <(pacman -Slq | sort) <(sort "$FILE_OFFICIAL_PKGS"))
 
-    local non_installable_packages=$(comm -13 \
-            <(pacman -Slq | sort) \
-        <(sort "$FILE_OFFICIAL_PKGS"))
+    local non_installable_packages=$(comm -13 <(pacman -Slq | sort) <(sort "$FILE_OFFICIAL_PKGS"))
 
     if [ -f "$FILE_OFFICIAL_PKGS" ]
     then
