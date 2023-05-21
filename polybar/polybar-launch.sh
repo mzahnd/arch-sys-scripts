@@ -49,9 +49,10 @@ readonly CONFIG_FOLDER='.config/polybar/'
 [ ${UID} -eq 0 ] && echo "Running as root is not possible." && exit 1
 
 # User must be running i3
-[ "${1}" != "force" ] && \
-    [ "${XDG_CURRENT_DESKTOP}" != "i3" ] && \
+if [ "${1}" != "force" ] && [ "${XDG_CURRENT_DESKTOP}" != "i3" ]; then
+    echo "Not running i3"
     exit 0
+fi
 
 [ "${1}" = "debug" ] && BAR_DEBUG=1
 

@@ -46,9 +46,10 @@ readonly CONFIG_FILE_PATH="${HOME}/.config/picom/picom.conf"
 [ ${UID} -eq 0 ] && echo "Running as root is not allowed." && exit 1
 
 # User must be running i3
-[ "${1}" != "force" ] && \
-    [ "${XDG_CURRENT_DESKTOP}" != "i3" ] && \
+if [ "${1}" != "force" ] && [ "${XDG_CURRENT_DESKTOP}" != "i3" ]; then
+    echo "Not running i3"
     exit 0
+fi
 
 [ "${1}" = "debug" ] && PICOM_DEBUG=1
 

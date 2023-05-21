@@ -49,9 +49,10 @@ readonly SCALING='fill'
 [ ${UID} -eq 0 ] && echo "Running as root is not allowed." && exit 1
 
 # User must be running i3
-[ "${1}" != "force" ] && \
-    [ "${XDG_CURRENT_DESKTOP}" != "i3" ] && \
+if [ "${1}" != "force" ] && [ "${XDG_CURRENT_DESKTOP}" != "i3" ]; then
+    echo "Not running i3"
     exit 0
+fi
 
 # Random wallpaper inside DIR
 feh --quiet --bg-"${SCALING}" --randomize --recursive "${DIR}"
