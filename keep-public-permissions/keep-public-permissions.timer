@@ -1,0 +1,15 @@
+[Unit]
+Description=Keep permissions in "/home/public" properly set
+
+[Timer]
+# Run 5 minutes after boot
+OnStartupSec=5m
+# Then every 107 minutes (1h 47min)
+OnUnitActiveSec=107m
+
+RandomizedDelaySec=30
+
+Persistent=true
+
+[Install]
+WantedBy=timers.target

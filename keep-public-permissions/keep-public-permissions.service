@@ -1,0 +1,10 @@
+[Unit]
+ConditionFileIsExecutable=/usr/local/bin/keep-public-permissions
+
+[Service]
+WorkingDirectory=/usr/local/bin/
+Type=oneshot
+ExecStart=/bin/bash /usr/local/bin/keep-public-permissions
+
+[Install]
+WantedBy=multi-user.target
