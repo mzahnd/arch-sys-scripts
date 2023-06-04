@@ -75,6 +75,10 @@ Available OPTIONs:
                         files listed above will be stored in the directory
                         containing the script.
 
+    --license
+    license
+                        License message.
+
     --help
      -h
     help
