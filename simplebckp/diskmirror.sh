@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 readonly OUT_DISK="/run/media/seabmo/DiscPMirror/"
 readonly IN_DISK="/run/media/seabmo/DiscoPort/" 

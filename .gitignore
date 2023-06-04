@@ -2,4 +2,5 @@
 backupsys/
 arch_installer/
 paclan/mirrorlist
+simplebckp/sync_folders
 *.log

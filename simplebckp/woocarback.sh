@@ -98,7 +98,7 @@ myecho "Done"
 myecho "Uploading..."
 
 #    --dry-run \
-    rclone sync "$OUTPUT_DIR" "$RCLONE_REMOTE_FOLDER" \
+rclone sync "$OUTPUT_DIR" "$RCLONE_REMOTE_FOLDER" \
     --checksum \
     --error-on-no-transfer \
     --delete-after \
