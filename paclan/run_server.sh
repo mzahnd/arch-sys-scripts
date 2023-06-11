@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-SERVER_IP="192.168.8.140"
+SERVER_IP="192.168.1.140"
 SERVER_PORT=8095
 MIRRORLIST="/etc/pacman.d/mirrorlist"
 

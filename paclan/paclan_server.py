@@ -6,7 +6,6 @@ import ipaddress
 import logging
 import os
 import posixpath
-import socketserver
 import sys
 import urllib.parse
 
