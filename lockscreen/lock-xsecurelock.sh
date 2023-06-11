@@ -28,11 +28,13 @@
 # Folder with images/videos to display
 if [[ "${HOSTNAME}" = 'wolf' || "${HOSTNAME}" = 'rhino' ]]; then
     readonly FOLDER='/home/public/Videos/LockScreen/Apple/'
+elif [[ "${HOSTNAME}" = 'fox' ]]; then
+    readonly FOLDER='/home/seabmo/Pictures/Wallpapers/Wolf/1920x1080/'
 else
     readonly FOLDER=''
 fi
 
-readonly FIND_CMD="-type f -regex '^.*\.\(mov\|mp4\|mkv\)$'"
+readonly FIND_CMD="-type f -regex '^.*\.\(mov\|mp4\|mkv\|png\|jpg\|jpeg\)$'"
 
 # For more environment variables run `xsecurelock --help`
 
@@ -66,6 +68,10 @@ export XSECURELOCK_SHOW_DATETIME=1
 # == END Auth box ==
 
 # == General config ==
+
+# Images
+export XSECURELOCK_IMAGE_DURATION_SECONDS=15
+
 # < 0 : Never blank the screen
 # In seconds
 export XSECURELOCK_BLANK_TIMEOUT=1800
