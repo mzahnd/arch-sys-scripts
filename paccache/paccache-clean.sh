@@ -1,5 +1,5 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
+#
 # The MIT License.
 #
 # Copyright (c) 2021 Martín E. Zahnd < mzahnd at itba dot edu dot ar >
@@ -21,7 +21,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+#
 
 
 # ==== EDITABLE SECTION ====
@@ -74,9 +74,9 @@ function yay_cache()
     # WARNING: If you're going to edit the printf flag, keep the spaces around
     #         to avoid printing something like 
     #         '--cachedir /home/john/.cache/yay/yay--cachedir /home/ ... '
-    local -r cached_pkgs="$(find ${cache_root}   \
-        -maxdepth 1 ! -path ${cache_root}        \
-        -type d                                 \
+    local -r cached_pkgs="$(find "${cache_root}" \
+        -maxdepth 1 ! -path "${cache_root}"      \
+        -type d                                  \
         -printf ' --cachedir %p ')"
 
     # Quoting ${cached_pkgs} here will result in paccache interpreting
@@ -85,6 +85,16 @@ function yay_cache()
         --keep "${KEEP_UPDATED}" --remove
     sudo -u "${1}" /usr/bin/paccache --verbose ${cached_pkgs} \
         --keep "${KEEP_UNINSTALLED}" --uninstalled --remove
+
+    # Remove unnecessary files
+    find "${cache_root}" \
+        -mindepth 2 -maxdepth 2 \
+        -not -iname "*.zst"     \
+        -not -name ".git"       \
+        -not -name "PKGBUILD"   \
+        -not -name ".SRCINFO"   \
+        -not -name ".gitignore" \
+        -exec rm -R {} \;
 
     return 0
 }
