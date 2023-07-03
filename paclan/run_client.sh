@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-SERVER_IP="192.168.8.140"
+SERVER_IP="192.168.1.140"
 SERVER_PORT=8095
 
 MIRRORLIST="/etc/pacman.d/mirrorlist"
@@ -16,8 +16,11 @@ sed -i "1s@^@Server = http://$SERVER_IP:$SERVER_PORT\n@" mirrorlist
 echo "Copying mirrorlist file to '$MIRRORLIST'"
 sudo cp mirrorlist "$MIRRORLIST"
 
-sudo pacman -Syy && \
-    sudo pacman -S -q --needed archlinux-keyring && \
-    sudo pacman -Su && \
-    yay --aur --batchinstall -Su
-
+if alias updatesys >/dev/null 2>&1; then
+    updatesys
+else
+    sudo pacman -Syy && \
+        sudo pacman -S -q --needed archlinux-keyring && \
+        sudo pacman -Su && \
+        yay --aur --batchinstall -Su
+fi
