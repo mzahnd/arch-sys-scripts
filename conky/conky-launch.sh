@@ -69,41 +69,8 @@ readonly CONFIGS=(\
 #   1 : At least one Conky instance could not be killed.
 function kill_conky()
 {
-    # local counter=0
-    local pid_list=""
-    # local children=""
-
-    # Terminate already running conky instances
-    #killall --quiet 'conky' # Old way
-
-    # List 'conky' processes ignoring conky_launch (see the grep line). This is
-    # very (!) important because 'kill' will try to _kill_ 'conky_launch' and
-    # that's not what we want.
-    # Then create a single-line space-separated string
-    # pid_list=$(\
-        #     ps x -o "%p %c" | \
-        #         grep -iE '[[:alnum:]]+\ conky$' | \
-        #         awk '{print $1}' ORS=' ' 2> /dev/null \
-        # )
-
-    # # List 'conky' direct children if they exist
-    # [ -n "$pid_list" ] && children=$(\
-        #     ps -o pid= --ppid $pid_list | awk '{print $1}' ORS=' ' 2> /dev/null \
-        # )
-
-    # if [ -n "$children" ]; then
-    #    kill $children
-    #    wait $children 2> /dev/null
-    # fi
-    # if [ -n "$pid_list" ]; then
-    #    kill $pid_list
-    #    wait $pid_list 2> /dev/null
-    # fi
-
-    pid_list=$(pgrep --euid "$USER" conky 2> /dev/null)
-    wait $pid_list
-
-    return 0
+    pkill --euid "$USER" "conky$" 2> /dev/null
+    return $?
 }
 
 # Launch a Conky instance in a specific monitor using a configuration file.
@@ -146,16 +113,18 @@ function launch_conky()
 #   Maximum Conky exit code after launching in each monitor.
 function start_conky()
 {
+    set -x
     local return_code=0
     local -r nmonitors="$(xrandr --listactivemonitors | \
                             awk 'NR==1 {print $2}')"
 
-    for (( i=0; i<${nmonitors}; i++)); do
+    for (( i=0; i < nmonitors; i++)); do
         for config_file in "${CONFIGS[@]}"; do
             launch_conky "${i}" "${config_file}"
-            return_code=$(( ${return_code} > ${?} ? ${return_code} : ${?} ))
+            return_code=$(( return_code > ${?} ? return_code : ${?} ))
         done
     done
+    set +x
 
     return ${return_code}
 }
@@ -175,7 +144,10 @@ function start_conky()
 #   Maximum Conky exit code after launching in each monitor.
 function main()
 {
-    kill_conky && start_conky; return $?
+    kill_conky
+    start_conky
+
+    return $?
 }
 
 
