@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-readonly OUT_DISK="/run/media/seabmo/DiscPMirror/"
 readonly IN_DISK="/run/media/seabmo/DiscoPort/" 
+readonly OUT_DISK="/run/media/seabmo/DiscPMirror/"
 readonly LOG_FILE="diskmirror.log"
 
 exclude_list=(\
