@@ -80,6 +80,8 @@ export XSECURELOCK_DISCARD_FIRST_KEYPRESS=1
 
 export XSECURELOCK_LIST_VIDEOS_COMMAND="find ${FOLDER} ${FIND_CMD}"
 export XSECURELOCK_SAVER=saver_mpv
+# mpv flags
+export XSECURELOCK_VIDEOS_FLAGS="--hwdec=auto"
 
 # This can cause problems. Be careful.
 export XSECURELOCK_FORCE_GRAB=1
@@ -94,6 +96,9 @@ export XSECURELOCK_WAIT_TIME_MS=0
 #export XSECURELOCK_DIM_FPS=60
 #export XSECURELOCK_DIM_OVERRIDE_COMPOSITOR_DETECTION=1
 #export XSECURELOCK_DIM_TIME_MS=1500
+
+# -- Stop saver on blank screen --
+export XSECURELOCK_SAVER_DELAY_MS=1
 
 # -- Keyboard --
 # .. Brightness keys ..
