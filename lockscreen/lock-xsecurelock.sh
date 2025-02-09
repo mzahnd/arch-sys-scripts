@@ -81,7 +81,7 @@ export XSECURELOCK_DISCARD_FIRST_KEYPRESS=1
 export XSECURELOCK_LIST_VIDEOS_COMMAND="find ${FOLDER} ${FIND_CMD}"
 export XSECURELOCK_SAVER=saver_mpv
 # mpv flags
-export XSECURELOCK_VIDEOS_FLAGS="--hwdec=auto"
+export XSECURELOCK_VIDEOS_FLAGS="--hwdec=auto --panscan=1.0"
 
 # This can cause problems. Be careful.
 export XSECURELOCK_FORCE_GRAB=1
