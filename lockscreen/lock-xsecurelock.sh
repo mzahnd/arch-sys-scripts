@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The MIT License.
 #
@@ -102,8 +102,8 @@ export XSECURELOCK_SAVER_DELAY_MS=1
 
 # -- Keyboard --
 # .. Brightness keys ..
-export XSECURELOCK_KEY_XF86MonBrightnessDown_COMMAND='/usr/local/bin/backlight-manager dec 1'
-export XSECURELOCK_KEY_XF86MonBrightnessUp_COMMAND='/usr/local/bin/backlight-manager inc 1'
+export XSECURELOCK_KEY_XF86MonBrightnessDown_COMMAND='backlight-manager dec 1'
+export XSECURELOCK_KEY_XF86MonBrightnessUp_COMMAND='backlight-manager inc 1'
 
 # .. Media keys ..
 export XSECURELOCK_KEY_XF86AudioMute_COMMAND="pactl set-sink-mute 0 toggle"

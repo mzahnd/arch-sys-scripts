@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The MIT License.
 #
@@ -37,25 +37,32 @@ readonly DIMMING_TIME='30'
 readonly SCRIPT_DIR="$(dirname ${BASH_SOURCE[0]})"
 readonly SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"
 
-TRANSFER_SCRIPT_PATH=''
-
-# Installer's path
-for file in "${SCRIPT_DIR}/${SCRIPT_NAME}.d"/*; do 
-    [ "${file##*/}" = "${TRANSFER_SCRIPT}" ] \
-    && TRANSFER_SCRIPT_PATH="${SCRIPT_DIR}/${SCRIPT_NAME}.d/${TRANSFER_SCRIPT}"
-done
-
-# In case it's not installed
 if [ -z "${TRANSFER_SCRIPT_PATH}" ]; then
-    for file in "${SCRIPT_DIR}"/*; do 
-        [ "${file##*/}" = "${TRANSFER_SCRIPT}" ] && \
-            TRANSFER_SCRIPT_PATH="${SCRIPT_DIR}/${TRANSFER_SCRIPT}"
-    done
+  TRANSFER_SCRIPT_PATH=''
+
+  # Installer's path
+  for file in "${SCRIPT_DIR}/${SCRIPT_NAME}.d"/*; do 
+      [ "${file##*/}" = "${TRANSFER_SCRIPT}" ] \
+      && TRANSFER_SCRIPT_PATH="${SCRIPT_DIR}/${SCRIPT_NAME}.d/${TRANSFER_SCRIPT}"
+  done
+  
+  # In case it's not installed
+  if [ -z "${TRANSFER_SCRIPT_PATH}" ]; then
+      for file in "${SCRIPT_DIR}"/*; do 
+          [ "${file##*/}" = "${TRANSFER_SCRIPT}" ] && \
+              TRANSFER_SCRIPT_PATH="${SCRIPT_DIR}/${TRANSFER_SCRIPT}"
+      done
+  fi
 fi
 
 [ -z "${TRANSFER_SCRIPT_PATH}" ] && exit 1
 
-killall -u ${USER} --quiet --wait xss-lock
+for pid in $(pgrep -f "xss-lock" --euid "$USER"); do
+    if [ "$pid" != "$SCRIPT_PID" ]; then
+        kill "$pid"
+        sleep 0.25
+    fi
+done
 
 # Activate xset
 xset s on
