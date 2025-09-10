@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The MIT License.
 #
@@ -72,7 +72,13 @@ function kill_picom()
     local counter=0
 
     # Terminate already running picom instances
-    killall --quiet 'picom'
+    SCRIPT_PID=$$
+    for pid in $(pgrep -f "picom" --euid "$USER"); do
+        if [ "$pid" != "$SCRIPT_PID" ]; then
+            kill "$pid"
+            sleep 0.25
+        fi
+    done
 
     # Wait until the processes have been shut down
     while pgrep -u $UID -x 'picom' >/dev/null; do
