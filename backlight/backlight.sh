@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The MIT License.
 #
-# Copyright (c) 2021 Martín E. Zahnd < mzahnd at itba dot edu dot ar >
+# Copyright (c) 2021 Martín E. Zahnd < martin at zahnd dot me >
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
