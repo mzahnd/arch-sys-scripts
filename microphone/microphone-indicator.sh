@@ -25,7 +25,7 @@
 
 # ====== EDITABLE SECTION ======
 
-readonly SOURCE_NUMBER=0
+readonly SOURCE_NUMBER="@DEFAULT_AUDIO_SOURCE@"
 
 # ====== END EDITABLE SECTION ======
 
@@ -38,7 +38,7 @@ if ! pushd "${SCRIPT_DIR}" &> /dev/null; then
 fi
 
 # Arbitrary but unique message tag
-readonly notification_tag="volume-indicator-dunst-script"
+readonly notification_tag="microphone-indicator-dunst-script-xhfd431"
 
 function usage
 {
@@ -74,23 +74,41 @@ EOF
 
 function is_muted
 {
-    pactl get-source-mute "$SOURCE_NUMBER" | awk -F ':' '{print $2}' | sed 's/[^a-z]//g'
+    # pactl get-source-mute "$SOURCE_NUMBER" | awk -F ':' '{print $2}' | sed 's/[^a-z]//g'
+    local status="$(wpctl get-volume "$SOURCE_NUMBER" | awk -F' ' '{print $3}' | sed 's/[^a-zA-Z]//g')"
+    if [ "$status" == "MUTED" ]; then
+        echo "yes"
+        return 0
+    fi
+    echo "no"
+    return 0
 }
 
 function get_current_volume
 {
     # Query pulseaudio for the current volume and whether or not the speaker is muted
-    pactl get-source-volume "$SOURCE_NUMBER" | head -1 | awk -F '/' '{print $2}' | sed 's/[^0-9]//g'
+    # pactl get-source-volume "$SOURCE_NUMBER" | head -1 | awk -F '/' '{print $2}' | sed 's/[^0-9]//g'
+    local volume=0
+    # dividing by 1 (/1) casts it to int
+    volume="$(echo "$(wpctl get-volume "$SOURCE_NUMBER" | sed 's/[^\.0-9]//g') * 100 / 1" | bc)"
+    echo "$volume"
+    return 0
 }
 
 function change_volume
 {
-    pactl set-source-volume "$SOURCE_NUMBER" "${1}%"
+    # pactl set-source-volume "$SOURCE_NUMBER" "${1}%"
+    local value="$(echo ${1} | sed 's/[^0-9]//g')"
+    local plus_minus="$(echo ${1} | sed 's/[^+-]//g')"
+    wpctl set-volume "$SOURCE_NUMBER" "${value}%${plus_minus}"
+    return 0
 }
 
 function toggle_mute
 {
-    pactl set-source-mute "$SOURCE_NUMBER" toggle
+    # pactl set-source-mute "$SOURCE_NUMBER" toggle
+    wpctl set-mute "$SOURCE_NUMBER" toggle
+    return 0
 }
 
 function show_notification
@@ -103,14 +121,18 @@ function show_notification
     local extra_hints="int:value:$volume"
 
     if [[ "$(is_muted)" == "yes" ]]; then
+        echo "muted"
         icon="microphone-sensitivity-muted-symbolic"
         text="Microphone muted"
         extra_hints=""
     elif [[ "$volume" -le 33 ]]; then
+        echo "le 33"
         icon="microphone-sensitivity-low-symbolic"
     elif [[ "$volume" -le 66 ]]; then
+        echo "le 66"
         icon="microphone-sensitivity-medium-symbolic"
     else
+        echo "gt 66"
         icon="microphone-sensitivity-high-symbolic"
     fi
 

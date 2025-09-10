@@ -25,7 +25,7 @@
 
 # ====== EDITABLE SECTION ======
 
-readonly SINK_NUMBER=0
+readonly SINK_NUMBER="@DEFAULT_AUDIO_SINK@"
 
 # ====== END EDITABLE SECTION ======
 
@@ -74,23 +74,41 @@ EOF
 
 function is_muted
 {
-    pactl get-sink-mute "$SINK_NUMBER" | awk -F ':' '{print $2}' | sed 's/[^a-z]//g'
+    # pactl get-sink-mute "$SINK_NUMBER" | awk -F ':' '{print $2}' | sed 's/[^a-z]//g'
+    local status="$(wpctl get-volume "$SINK_NUMBER" | awk -F' ' '{print $3}' | sed 's/[^a-zA-Z]//g')"
+    if [ "$status" == "MUTED" ]; then
+        echo "yes"
+        return 0
+    fi
+    echo "no"
+    return 0
 }
 
 function get_current_volume
 {
     # Query pulseaudio for the current volume and whether or not the speaker is muted
-    pactl get-sink-volume "$SINK_NUMBER" | head -1 | awk -F '/' '{print $2}' | sed 's/[^0-9]//g'
+    # pactl get-sink-volume "$SINK_NUMBER" | head -1 | awk -F '/' '{print $2}' | sed 's/[^0-9]//g'
+    local volume=0
+    # dividing by 1 (/1) casts it to int
+    volume="$(echo "$(wpctl get-volume "$SINK_NUMBER" | sed 's/[^\.0-9]//g') * 100 / 1" | bc)"
+    echo "$volume"
+    return 0
 }
 
 function change_volume
 {
-    pactl set-sink-volume "$SINK_NUMBER" "${1}%"
+    # pactl set-sink-volume "$SINK_NUMBER" "${1}%"
+    local value="$(echo ${1} | sed 's/[^0-9]//g')"
+    local plus_minus="$(echo ${1} | sed 's/[^+-]//g')"
+    wpctl set-volume "$SINK_NUMBER" "${value}%${plus_minus}"
+    return 0
 }
 
 function toggle_mute
 {
-    pactl set-sink-mute "$SINK_NUMBER" toggle
+    # pactl set-sink-mute "$SINK_NUMBER" toggle
+    wpctl set-mute "$SINK_NUMBER" toggle
+    return 0
 }
 
 function show_notification

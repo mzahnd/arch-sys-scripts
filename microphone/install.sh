@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # The MIT License.
 #
 # Copyright (c) 2021 Martín E. Zahnd < mzahnd at itba dot edu dot ar >
