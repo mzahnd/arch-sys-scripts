@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The MIT License.
 #
@@ -74,8 +74,14 @@ function kill_all_bars()
     local counter=0
 
     # Terminate already running bar instances
-    killall --quiet 'polybar'
-    
+    SCRIPT_PID=$$
+    for pid in $(pgrep -f "polybar" --euid "$USER"); do
+        if [ "$pid" != "$SCRIPT_PID" ]; then
+            kill "$pid"
+            sleep 0.25
+        fi
+    done
+
     # Wait until the processes have been shut down
     while pgrep -u $UID -x 'polybar' >/dev/null; do 
         counter=$((counter+1))
