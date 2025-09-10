@@ -1,5 +1,4 @@
-#!/usr/bin/bash
-
+#!/usr/bin/env bash
 
 # The MIT License.
 #
@@ -69,7 +68,13 @@ readonly CONFIGS=(\
 #   1 : At least one Conky instance could not be killed.
 function kill_conky()
 {
-    pkill --euid "$USER" "conky$" 2> /dev/null
+    SCRIPT_PID=$$
+    for pid in $(pgrep -f "conky" --euid "$USER"); do
+        if [ "$pid" != "$SCRIPT_PID" ]; then
+            kill "$pid"
+            sleep 0.25
+        fi
+    done
     return $?
 }
 
