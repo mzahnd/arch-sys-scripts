@@ -33,7 +33,7 @@ readonly SKIPPED_USERS=('nobody' 'nobody4')
 
 # Number of the latest version of installed packages that should be kept.
 # Applies to both pacman and yay cache.
-readonly KEEP_UPDATED=2
+readonly KEEP_UPDATED=1
 # Number of the latest version of removed packages that should be kept.
 # Applies to both pacman and yay cache.
 readonly KEEP_UNINSTALLED=0

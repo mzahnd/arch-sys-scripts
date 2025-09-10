@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 readonly OUTPUT="${HOME}/Documents/Telefonino/"
 readonly PHONE="/run/user/1000/gvfs/mtp:host=SAMSUNG_SAMSUNG_Android_R58RA11X8AJ/" # Galaxy A22

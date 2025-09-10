@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The MIT License.
 #
@@ -33,7 +33,7 @@ readonly SKIPPED_USERS=('nobody' 'nobody4')
 
 # Number of the latest version of installed packages that should be kept.
 # Applies to both pacman and yay cache.
-readonly KEEP_UPDATED=2
+readonly KEEP_UPDATED=1
 # Number of the latest version of removed packages that should be kept.
 # Applies to both pacman and yay cache.
 readonly KEEP_UNINSTALLED=0
@@ -92,7 +92,6 @@ function yay_cache()
 }
 
 
-set -x
 # Yay
 #while read -r user; do
 #    username="${user%%:*}"
@@ -107,6 +106,5 @@ set -x
     #        [[ ! "${SKIPPED_USERS[@]}" =~ "${username}" ]] && \
     #done < <(awk -v FS=':' '{printf "%s:%s:%s\n",$1,$3,$6;}' /etc/passwd)
 yay_cache "seabmo" "/home/seabmo"
-set +x
 
 exit 0

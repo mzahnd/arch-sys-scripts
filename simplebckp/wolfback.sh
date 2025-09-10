@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 # shellcheck disable=2155
 readonly SCRIPTNAME=$(basename "$0")
