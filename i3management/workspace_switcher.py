@@ -3,26 +3,24 @@
 import asyncio
 import re
 
-from i3ipc.aio import Connection
+from i3ipc import Connection
 
 OUTPUT_MAIN = "eDP-1"
 OUTPUT_IGNORE = ("xroot-0", "VIRTUAL-1", "DP-1", "HDMI-2")  # Outputs to ignore
 
 
-async def get_focused_monitor(i3, primary, secondary):
-    workspaces = await i3.get_workspaces()
+def get_focused_monitor(i3, primary, secondary):
+    workspaces = i3.get_workspaces()
 
     for workspace in workspaces:
-        if workspace.name == primary and workspace.focused is True:
-            return primary
-        elif workspace.name == secondary and workspace.focused is True:
-            return secondary
+        if workspace.focused and workspace.name in (primary,secondary):
+            return workspace.name
 
     return ""
 
 
-async def get_temporary_workspace(i3):
-    workspaces = await i3.get_workspaces()
+def get_temporary_workspace(i3):
+    workspaces = i3.get_workspaces()
     numbered_workspaces = filter(lambda w: w.name[0].isdigit(), workspaces)
     numbers = list(
         map(
@@ -36,54 +34,35 @@ async def get_temporary_workspace(i3):
             return i
 
 
-async def swap_workspace_names(i3, primary, secondary):
+def swap_workspace_names(i3, primary, secondary):
     """Swap workspaces names"""
 
-    tmp_workspace = await get_temporary_workspace(i3)
+    tmp_workspace = get_temporary_workspace(i3)
 
-    await i3.command(
-        "rename workspace {old} to {new}".format(old=primary, new=tmp_workspace)
-    )
-
-    await i3.command(
-        "rename workspace {old} to {new}".format(
-            old=secondary,
-            new=primary,
-        )
-    )
-
-    await i3.command(
-        "rename workspace {old} to {new}".format(
-            old=tmp_workspace, new=secondary
-        )
-    )
+    i3.command(f"rename workspace {primary} to {tmp_workspace}")
+    i3.command(f"rename workspace {secondary} to {primary}")
+    i3.command(f"rename workspace {tmp_workspace} to {secondary}")
 
 
-async def swap_workspaces_outputs(i3, primary, secondary):
+def swap_workspaces_outputs(i3, primary, secondary):
     """Swap workspaces from one monitor to another"""
 
-    await i3.command("focus output {output}".format(output=primary.name))
-    await i3.command(
-        "move workspace to output {output}".format(output=secondary.name)
-    )
+    i3.command(f"focus output {primary.name}")
+    i3.command(f"move workspace to output {secondary.name}")
 
-    await i3.command("focus output {output}".format(output=secondary.name))
-    await i3.command(
-        "move workspace to output {output}".format(output=primary.name)
-    )
+    i3.command(f"focus output {secondary.name}")
+    i3.command(f"move workspace to output {primary.name}")
 
     # Show both workspaces again on screen and focus the one which used to be
     # "secondary"
-    await i3.command(
-        "workspace {name}".format(name=secondary.current_workspace)
-    )
-    await i3.command("workspace {name}".format(name=primary.current_workspace))
+    i3.command(f"workspace {secondary.current_workspace}")
+    i3.command(f"workspace {primary.current_workspace}")
 
 
-async def main():
-    i3 = await Connection().connect()
+def main():
+    i3 = Connection()
 
-    outputs = await i3.get_outputs()
+    outputs = i3.get_outputs()
 
     primary_output = None
     secondary_output = None
@@ -92,15 +71,13 @@ async def main():
         print(output.name)
         if output.name == OUTPUT_MAIN:
             primary_output = output
-        elif output.name in OUTPUT_IGNORE:
-            continue
-        else:
+        elif output.name not in OUTPUT_IGNORE:
             secondary_output = output
 
-    if secondary_output is None:
+    if not primary_output or not secondary_output:
         return
 
-    focused = await get_focused_monitor(
+    focused = get_focused_monitor(
         i3, primary_output.current_workspace, secondary_output.current_workspace
     )
 
@@ -110,12 +87,12 @@ async def main():
         primary_output = secondary_output
         secondary_output = tmp
 
-    await swap_workspace_names(
+    swap_workspace_names(
         i3, primary_output.current_workspace, secondary_output.current_workspace
     )
 
-    await swap_workspaces_outputs(i3, primary_output, secondary_output)
+    swap_workspaces_outputs(i3, primary_output, secondary_output)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
