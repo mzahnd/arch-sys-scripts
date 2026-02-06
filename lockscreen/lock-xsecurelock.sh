@@ -23,16 +23,8 @@
 # SOFTWARE.
 #
 
-
-
 # Folder with images/videos to display
-if [[ "${HOSTNAME}" = 'wolf' || "${HOSTNAME}" = 'rhino' ]]; then
-    readonly FOLDER='/home/public/Videos/LockScreen/Apple/'
-elif [[ "${HOSTNAME}" = 'fox' ]]; then
-    readonly FOLDER='/home/seabmo/Pictures/Wallpapers/Wolf/1920x1080/'
-else
-    readonly FOLDER=''
-fi
+readonly FOLDER='/home/public/Videos/LockScreen/Apple/'
 
 readonly FIND_CMD="-type f -regex '^.*\.\(mov\|mp4\|mkv\|png\|jpg\|jpeg\)$'"
 

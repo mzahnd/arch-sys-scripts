@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 
 SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
-if ! pushd "${SCRIPT_DIR}" &> /dev/null; then
+if ! pushd "${SCRIPT_DIR}" &>/dev/null; then
     exit 1
 fi
 
-SERVER_IP="192.168.1.140"
+SERVER_IP="200.127.0.140"
 SERVER_PORT=8095
 
 MIRRORLIST="/etc/pacman.d/mirrorlist"
 
-if ! curl -O "$SERVER_IP:$SERVER_PORT/mirrorlist"
-then
+if ! curl -O "$SERVER_IP:$SERVER_PORT/mirrorlist"; then
     echo "Could not download mirrorlist"
     exit 1
 fi
@@ -24,8 +23,8 @@ sudo cp mirrorlist "$MIRRORLIST"
 if alias updatesys >/dev/null 2>&1; then
     updatesys
 else
-    sudo pacman -Syy && \
-        sudo pacman -S -q --needed archlinux-keyring && \
-        sudo pacman -Su && \
+    sudo pacman -Syy &&
+        sudo pacman -S -q --needed archlinux-keyring &&
+        sudo pacman -Su &&
         yay --aur --batchinstall -Su
 fi
