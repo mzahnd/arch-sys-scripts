@@ -5,14 +5,14 @@ readonly PHONE="/run/user/1000/gvfs/mtp:host=SAMSUNG_SAMSUNG_Android_R58W50AJK2M
 
 # Relative to $PHONE
 phone_dirs=(
-    "/Interner Speicher/DCIM"
-    "/Interner Speicher/DCIM/Screenshots"
-    "/Interner Speicher/Documents"
-    "/Interner Speicher/Download"
-    "/Interner Speicher/Movies"
-    "/Interner Speicher/Pictures"
-    "/Interner Speicher/Android/media/com.whatsapp/WhatsApp/Media"
-    "/Interner Speicher (Dual Messenger)/Android/media/com.whatsapp/WhatsApp/Media"
+    "/Spazio di archiviazione interno/DCIM"
+    "/Spazio di archiviazione interno/DCIM/Screenshots"
+    "/Spazio di archiviazione interno/Documents"
+    "/Spazio di archiviazione interno/Download"
+    "/Spazio di archiviazione interno/Movies"
+    "/Spazio di archiviazione interno/Pictures"
+    "/Spazio di archiviazione interno/Android/media/com.whatsapp/WhatsApp/Media"
+    "/Archiviazione interna (Doppio Account)/Android/media/com.whatsapp/WhatsApp/Media"
 )
 
 exclude_list=("Private/" "Sent/" "Obsidian/" 'Documentos y digitalizaciones/' "Kee/" ".thumbnails/" "APN/" ".Thumbs" ".trash" ".StickerThumbs" "WhatsApp Stickers")

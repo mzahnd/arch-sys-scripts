@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-readonly OUTPUT="${HOME}/Documents/Telefonino/"
+readonly OUTPUT="${HOME}/Documents/Telefonino_mart/"
 readonly PHONE="/run/user/1000/gvfs/mtp:host=SAMSUNG_SAMSUNG_Android_R58W4148F8M/" # Galaxy A24 Business
 
 # Relative to $PHONE
